@@ -12,7 +12,7 @@ using namespace std;
  */
 
 
-int simulate(unsigned short);
+void simulate(unsigned short);
 
 unsigned char Mem[1024];        //memory is 1024 bytes?
 unsigned int Regs[16];          //each register is 4 bytes?
@@ -85,7 +85,7 @@ void regPrint(unsigned int RList, int& rCount)
 
 
 
-int simulate(unsigned short instr)
+void simulate(unsigned short instr)
 {
     unsigned char fmt, op, offset5, rd, rs, offset3, rn;
 
@@ -93,37 +93,37 @@ int simulate(unsigned short instr)
 
     switch (fmt)
     {
-    case 0:             // format 1/2
+    case 0:{             // format 1/2
         op = (instr >> 11) & 3;         //mask to get bits 11 &12 (opcode in format 1)
         rd = instr & 7;                 //mask to get 3 rightmost bits (rd for formats 1,2,4,7,8,9,10)
         rs = (instr >> 3) & 7;         //mask to get bits 3,4,5 (rs for formats 1,2,4  &  rb for 7,8,9,10)
         offset5 = (instr >> 6) & 0x1F;  //mask to get bits 6-10 (offset5 for formats 1,9,10)
         if (op != 3)
-
         {     // format 1
-
             switch (op)
             {
-            case 0: printf("lsl\tr%d, r%d, #%d\n", rd, rs, offset5);    //logical left shift instruction 
+            case 0:
+                printf("lsl\tr%d, r%d, #%d\n", rd, rs, offset5);    //logical left shift instruction 
                 Regs[rd] = (Regs[rs] << offset5);
                 cout << "\n \t R" << rd << " has been modified to: "<<Regs[rd];
                 break;
 
-            case 1: printf("lsr\tr%d, r%d, #%d\n", rd, rs, offset5);     //logical right shift instruction  
+            case 1:
+                printf("lsr\tr%d, r%d, #%d\n", rd, rs, offset5);     //logical right shift instruction  
                 Regs[rd] = (Regs[rs] / (2^offset5);
                 cout << "\n \t R" << rd << " has been modified to: "<<Regs[rd];
                 break;
 
-            case 2: printf("asr\tr%d, r%d, #%d\n", rd, rs, offset5);      //arithmetic right shift instruction
+            case 2: 
+                printf("asr\tr%d, r%d, #%d\n", rd, rs, offset5);      //arithmetic right shift instruction
                 Regs[rd] = (Regs[rs] >> offset5);            
                 cout << "\n \t R" << rd << " has been modified to: "<<Regs[rd];
                 break;
             default:
                 printf("UNKNOWN INSTR\n");
-
-
             }
         }
+                                               
         else
         { /*add/sub*/      // format 2
             offset3 = rn = offset5 & 0x07;          //mask to get 3 right most bits of offset5
@@ -156,9 +156,9 @@ int simulate(unsigned short instr)
             }
         }
         break;
+}
 
-
-    case 1:        //format 3  (move/compare/add/subtract Immediate)
+    case 1:{        //format 3  (move/compare/add/subtract Immediate)
         op = (instr >> 11) & 3;         //mask to get bits 11 &12 (opcode)
         rd = (instr >> 8) & 7;                 //mask to get 3 bits f (bits 8,9,19 for rd)
         int offset8 = instr & 0xFF;      //mask to get bits 0-7 (offset8)
@@ -188,9 +188,9 @@ int simulate(unsigned short instr)
             printf("UNKNOWN INSTR\n");
         }
         break;
+    }
 
-
-    case 2:        //formats 4, 5, 6, 7, 8
+    case 2:{        //formats 4, 5, 6, 7, 8
         op = (instr >> 11) & 3;         //mask to get bits 11 &12 (opcode)
         rd = instr & 7;                 //mask to get 3 rightmost bits (rd for formats 4,5,7,8)
         rs = (instr >> 3) & 7;         //mask to get bits 3,4,5 (rs for formats 4,5  &  rb for 7,8)
@@ -406,7 +406,6 @@ int simulate(unsigned short instr)
             }
             break;
 
-
         case 1:     //format 6
             rd = (instr >> 8) & 7;      //mask to get bits 8,9,10 (rd for format 6)
             int word8 = instr & 0x7f;     //mask to get 8 rightmost bits for immediate offset (Word8)
@@ -485,10 +484,10 @@ int simulate(unsigned short instr)
 
     break;          //to close case 2
 
+    }
 
 
-
-case 3:    // format 9
+case 3:{    // format 9
     int BL = (instr >> 11) & 3;
     switch (BL)
     {
@@ -531,10 +530,10 @@ case 3:    // format 9
 
     }
     break;
+}
 
 
-
-case 5:        //formats 13 & 14
+case 5:{        //formats 13 & 14
     unsigned int L = (instr >> 11) & 1;
     unsigned int R = (instr >> 8) & 1;
     unsigned int RList = instr & 0x007F;
@@ -592,9 +591,10 @@ case 5:        //formats 13 & 14
     }
 
         break;
+}
 
 
-case 6:     //formats 16 and 17
+case 6:{     //formats 16 and 17
     unsigned int cond = (instr >> 8) & 0xF;
     unsigned int v8 = instr & 0x00FF;
     if (cond == 15) {             // format 17
@@ -669,12 +669,12 @@ case 6:     //formats 16 and 17
         }
     }
     break;
+}
 
 
 
 
-
-case 7:        //formats 18 & 19
+case 7:{        //formats 18 & 19
     if (((instr >> 11) & 3) == 0) {        //if opcode == 0 ; -> format 18 (unconditional branch)
         int off;            //declare offset11 (bits 0-10)
         if (instr & 0x400)            //if sign bit == 1
@@ -713,6 +713,7 @@ case 7:        //formats 18 & 19
     }
 
         break;
+}
 
 default:
     printf("UNKNOWN INSTR!\n");
